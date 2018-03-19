@@ -86,7 +86,7 @@ def findYoctoVersion():
 # Renames a .bbappend to .off
 def disableBbappend(file):
 	if os.path.isfile(file):
-		os.rename(file, file[:8] + '.off')
+		os.rename(file, file[:-8] + '.off')
 
 ################################################################################
 # Main                                                                         #
