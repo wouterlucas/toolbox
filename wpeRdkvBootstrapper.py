@@ -19,7 +19,10 @@ manifest = {
 	'17.3' : [
 		'./meta-rdk-broadcom-generic-rdk/meta-brcm-generic-rdk/recipes-wpe/wpewebkit/wpewebkit_%.bbappend',
 		'./meta-cmf-raspberrypi/recipes-wpe/wpewebkit/wpewebkit_%.bbappend',
-		'./meta-rdk-broadcom-generic-rdk/meta-brcm-generic-rdk/recipes-wpe/wpebackend-rdk/wpebackend-rdk_0.1.bbappend'
+		'./meta-rdk-broadcom-generic-rdk/meta-brcm-generic-rdk/recipes-wpe/wpebackend-rdk/wpebackend-rdk_0.1.bbappend',
+		'./meta-rdk-video/recipes-graphics/cairo/cairo_%.bbappend',
+		'./meta-rdk-video/recipes-multimedia/gstreamer/gstreamer1.0_1.10.4.bbappend',
+		'./meta-rdk-broadcom-generic-rdk/meta-brcm-generic-rdk/recipes-graphics/westeros/westeros.bbappend'
 	]
 }
 
