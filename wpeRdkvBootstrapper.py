@@ -10,19 +10,19 @@ import sys, getopt, re, fileinput, urllib2, json, base64, os
 manifest = {
 	'17.2' : [
 		'./meta-cmf-raspberrypi/recipes-wpe/wpewebkit/wpewebkit_%.bbappend',
+		'./meta-cmf-raspberrypi/recipes-wpe/wpebackend-rdk/wpebackend-rdk_%.bbappend',
 		'./meta-rdk-oem-tch-broadcom/meta-tch-spectrum-120i-uhd/recipes-wpe/wpewebkit/wpewebkit_%.bbappend',
 		'./meta-rdk-charter-technicolor/recipes-wpe/wpewebkit/wpewebkit_%.bbappend',
-		'./meta-cmf-raspberrypi/recipes-wpe/wpebackend-rdk/wpebackend-rdk_%.bbappend',
+		'./meta-rdk-broadcom-generic-rdk/meta-brcm-generic-rdk/recipes-wpe/wpewebkit/wpewebkit_%.bbappend',
 		'./meta-rdk-broadcom-generic-rdk/meta-brcm-generic-rdk/recipes-wpe/wpebackend-rdk/wpebackend-rdk_0.1.bbappend',
-		'./meta-rdk-oem-tch-broadcom/meta-tch-spectrum-120i-uhd/recipes-wpe/wpebackend-rdk/wpebackend-rdk_0.1.bbappend'
 	],
 	'17.3' : [
 		'./meta-rdk-broadcom-generic-rdk/meta-brcm-generic-rdk/recipes-wpe/wpewebkit/wpewebkit_%.bbappend',
 		'./meta-cmf-raspberrypi/recipes-wpe/wpewebkit/wpewebkit_%.bbappend',
-		'./meta-rdk-broadcom-generic-rdk/meta-brcm-generic-rdk/recipes-wpe/wpebackend-rdk/wpebackend-rdk_0.1.bbappend',
-		'./meta-rdk-video/recipes-graphics/cairo/cairo_%.bbappend',
-		'./meta-rdk-video/recipes-multimedia/gstreamer/gstreamer1.0_1.10.4.bbappend',
-		'./meta-rdk-broadcom-generic-rdk/meta-brcm-generic-rdk/recipes-graphics/westeros/westeros.bbappend'
+                './meta-rdk-broadcom-generic-rdk/meta-brcm-generic-rdk/recipes-wpe/wpebackend-rdk/wpebackend-rdk_0.1.bbappend',
+                './meta-rdk-video/recipes-graphics/cairo/cairo_%.bbappend',
+                './meta-rdk-video/recipes-multimedia/gstreamer/gstreamer1.0_1.10.4.bbappend',
+		'./meta-rdk-broadcom-generic-rdk/meta-brcm-generic-rdk/recipes-wpe/wpebackend-rdk/wpebackend-rdk_0.1.bbappend'
 	]
 }
 
@@ -89,7 +89,7 @@ def findYoctoVersion():
 # Renames a .bbappend to .off
 def disableBbappend(file):
 	if os.path.isfile(file):
-		os.rename(file, file[:-8] + '.off')
+		os.rename(file, file[:-9] + '.off')
 
 ################################################################################
 # Main                                                                         #
