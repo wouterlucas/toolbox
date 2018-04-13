@@ -2,27 +2,31 @@
 # WPE RDKV post-release bootstrapper
 # Enables latest WPE on older versions of RDK
 
-import sys, getopt, re, fileinput, urllib2, json, base64, os
+import sys, getopt, re, fileinput, urllib2, json, base64, os, subprocess
 
 ################################################################################
 # Variables                                                                    #
 ################################################################################
 manifest = {
 	'17.2' : [
-		'./meta-cmf-raspberrypi/recipes-wpe/wpewebkit/wpewebkit_%.bbappend',
-		'./meta-cmf-raspberrypi/recipes-wpe/wpebackend-rdk/wpebackend-rdk_%.bbappend',
-		'./meta-rdk-oem-tch-broadcom/meta-tch-spectrum-120i-uhd/recipes-wpe/wpewebkit/wpewebkit_%.bbappend',
-		'./meta-rdk-charter-technicolor/recipes-wpe/wpewebkit/wpewebkit_%.bbappend',
-		'./meta-rdk-broadcom-generic-rdk/meta-brcm-generic-rdk/recipes-wpe/wpewebkit/wpewebkit_%.bbappend',
-		'./meta-rdk-broadcom-generic-rdk/meta-brcm-generic-rdk/recipes-wpe/wpebackend-rdk/wpebackend-rdk_0.1.bbappend',
+		'/meta-cmf-raspberrypi/recipes-wpe/wpewebkit/wpewebkit_%.bbappend',
+		'/meta-cmf-raspberrypi/recipes-wpe/wpebackend-rdk/wpebackend-rdk_%.bbappend',
+		'/meta-rdk-oem-tch-broadcom/meta-tch-spectrum-120i-uhd/recipes-wpe/wpewebkit/wpewebkit_%.bbappend',
+		'/meta-rdk-charter-technicolor/recipes-wpe/wpewebkit/wpewebkit_%.bbappend',
+		'/meta-rdk-broadcom-generic-rdk/meta-brcm-generic-rdk/recipes-wpe/wpewebkit/wpewebkit_%.bbappend',
+		'/meta-rdk-broadcom-generic-rdk/meta-brcm-generic-rdk/recipes-wpe/wpebackend-rdk/wpebackend-rdk_0.1.bbappend',
+		'/meta-rdk-video/recipes-multimedia/gstreamer/gstreamer1.0*',
+		'/meta-rdk-broadcom-generic-rdk/meta-brcm-generic-rdk/recipes-multimedia/gstreamer/gstreamer1.0-plugins-good*'
 	],
 	'17.3' : [
-		'./meta-rdk-broadcom-generic-rdk/meta-brcm-generic-rdk/recipes-wpe/wpewebkit/wpewebkit_%.bbappend',
-		'./meta-cmf-raspberrypi/recipes-wpe/wpewebkit/wpewebkit_%.bbappend',
-                './meta-rdk-broadcom-generic-rdk/meta-brcm-generic-rdk/recipes-wpe/wpebackend-rdk/wpebackend-rdk_0.1.bbappend',
-                './meta-rdk-video/recipes-graphics/cairo/cairo_%.bbappend',
-                './meta-rdk-video/recipes-multimedia/gstreamer/gstreamer1.0_1.10.4.bbappend',
-		'./meta-rdk-broadcom-generic-rdk/meta-brcm-generic-rdk/recipes-wpe/wpebackend-rdk/wpebackend-rdk_0.1.bbappend'
+		'/meta-rdk-broadcom-generic-rdk/meta-brcm-generic-rdk/recipes-wpe/wpewebkit/wpewebkit_%.bbappend',
+		'/meta-cmf-raspberrypi/recipes-wpe/wpewebkit/wpewebkit_%.bbappend',
+		'/meta-rdk-broadcom-generic-rdk/meta-brcm-generic-rdk/recipes-wpe/wpebackend-rdk/wpebackend-rdk_0.1.bbappend',
+		'/meta-rdk-video/recipes-graphics/cairo/cairo_%.bbappend',
+		'/meta-rdk-video/recipes-multimedia/gstreamer/gstreamer1.0_1.10.4.bbappend',
+		'/meta-rdk-broadcom-generic-rdk/meta-brcm-generic-rdk/recipes-wpe/wpebackend-rdk/wpebackend-rdk_0.1.bbappend',
+		'/meta-rdk-video/recipes-multimedia/gstreamer/gstreamer1.0*',
+		'/meta-rdk-broadcom-generic-rdk/meta-brcm-generic-rdk/recipes-multimedia/gstreamer/gstreamer1.0-plugins-good*'
 	]
 }
 
@@ -73,7 +77,7 @@ def findYoctoVersion():
 
 	with open(yoctoDistroConf, 'r') as f:
 		for line_terminated in f:
-			line = line_terminated.rstrip('\n')  
+			line = line_terminated.rstrip('\n')
 
 			# skip garbage
 			if line[0:1] == ' ' or line == '' or line[0:1] == '#':
@@ -86,43 +90,78 @@ def findYoctoVersion():
 
 	return version
 
-# Renames a .bbappend to .off
-def disableBbappend(file):
-	if os.path.isfile(file):
-		os.rename(file, file[:-9] + '.off')
+def generateBBMask(mask):
+	return 'BBMASK += "' + mask + '"\n'
+
+def writeSiteConf(bbmasks, siteConfFile):
+	with open(siteConfFile,'a+') as f:
+		f.write(bbmasks)
+	return
+
+def silentExec(processAndParamsList):
+	with open(os.devnull, 'wb') as devnull:
+		subprocess.check_call(processAndParamsList, stdout=devnull, stderr=subprocess.STDOUT)
+		return
 
 ################################################################################
 # Main                                                                         #
 ################################################################################
 def main(argv):
+	bbMaskString 	= ""
+	buildDirFound   = False
+
 	# Figure out which version of RDKV & Yocto were up against
 	rdkvVersion     = findRdkvVersion()
-	print 'Found RDKV v' + rdkvVersion
+	yoctoVersionName = rdkToYoctoMapping[ rdkvVersion ]
+	print 'Found RDKV v' + rdkvVersion + ' and Yocto ' + yoctoVersionName
 
 	# Disabled because aparently DISTRO VERSION isnt updated correctly for each RDK release :-(
 	#yoctoVersion    = findYoctoVersion()
 	#print 'Found Yocto v' + yoctoVersion
 	#yoctoVersionName = yoctoMapping[ yoctoVersion ]
 
-	fileList = manifest[ rdkvVersion ]
-
-	for file in fileList:
-		disableBbappend(file)
-		print "Disabled " + file
-
-	
-	yoctoVersionName = rdkToYoctoMapping[ rdkvVersion ]
-	print 'Syncing meta-wpe to ' + yoctoVersionName + ' branch'
-
 	# Sync meta-wpe to latest relevant meta-wpe Yocto branch if meta-wpe directory does not exist
-	if os.path.isdir('./meta-wpe') == False:
-		os.system('git clone git@github.com:WebPlatformForEmbedded/meta-wpe.git -b ' + yoctoVersionName)
 
-	os.chdir('./meta-wpe')
-	os.system('git checkout ' + yoctoVersionName)
-	os.system('git fetch')
-	os.system('git rebase')
-	os.chdir('..')
+	if os.path.isdir('./meta-wpe') == False:
+		print 'Creating new clone of meta-wpe with the ' + yoctoVersionName + ' branch'
+		silentExec(['git','clone','git@github.com:WebPlatformForEmbedded/meta-wpe.git','-b', yoctoVersionName])
+	else:
+		print 'Syncing latest meta-wpe to ' + yoctoVersionName + ' branch'
+
+		os.chdir('./meta-wpe')
+		silentExec(['git','checkout',yoctoVersionName])
+		silentExec(['git','fetch'])
+		silentExec(['git','rebase'])
+		os.chdir('..')
+
+
+	# generating bbmasks
+	maskList = manifest[ rdkvVersion ]
+
+	for e in maskList:
+		bbMaskString += generateBBMask(e)
+
+
+	#Trying to find your build directory
+	dirList = os.listdir(os.getcwd())
+
+	# check for existing build directory, which means yocto has been previously setup and we can write a site.conf if empty
+	for d in dirList:
+		if d[0:6] == 'build-':
+			print 'Found build dir: ' + d
+			buildDirFound = True
+
+			siteConfFile = './' + d + '/conf/site.conf'
+
+			if os.path.isfile(siteConfFile) == False:
+				print 'No site.conf found in build dir, creating it'
+				writeSiteConf(bbMaskString, siteConfFile)
+			else:
+				print 'Site conf is already present, did you run this script already?\n'
+				print 'Please add the following to your local.conf or site.conf:'
+				print bbMaskString
+
+
 
 	print '\nDone! Please make sure to add meta-wpe to your bblayers when creating the build.'
 
