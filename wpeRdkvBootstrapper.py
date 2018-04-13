@@ -108,7 +108,6 @@ def silentExec(processAndParamsList):
 ################################################################################
 def main(argv):
 	bbMaskString 	= ""
-	buildDirFound   = False
 
 	# Figure out which version of RDKV & Yocto were up against
 	rdkvVersion     = findRdkvVersion()
@@ -121,7 +120,6 @@ def main(argv):
 	#yoctoVersionName = yoctoMapping[ yoctoVersion ]
 
 	# Sync meta-wpe to latest relevant meta-wpe Yocto branch if meta-wpe directory does not exist
-
 	if os.path.isdir('./meta-wpe') == False:
 		print 'Creating new clone of meta-wpe with the ' + yoctoVersionName + ' branch'
 		silentExec(['git','clone','git@github.com:WebPlatformForEmbedded/meta-wpe.git','-b', yoctoVersionName])
@@ -149,8 +147,6 @@ def main(argv):
 	for d in dirList:
 		if d[0:6] == 'build-':
 			print 'Found build dir: ' + d
-			buildDirFound = True
-
 			siteConfFile = './' + d + '/conf/site.conf'
 
 			if os.path.isfile(siteConfFile) == False:
