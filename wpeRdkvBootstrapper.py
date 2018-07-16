@@ -26,7 +26,8 @@ manifest = {
 		'/meta-rdk-video/recipes-multimedia/gstreamer/gstreamer1.0_1.10.4.bbappend',
 		'/meta-rdk-broadcom-generic-rdk/meta-brcm-generic-rdk/recipes-wpe/wpebackend-rdk/wpebackend-rdk_0.1.bbappend',
 		'/meta-rdk-video/recipes-multimedia/gstreamer/gstreamer1.0*',
-		'/meta-rdk-broadcom-generic-rdk/meta-brcm-generic-rdk/recipes-multimedia/gstreamer/gstreamer1.0-plugins-good*'
+		'/meta-rdk-broadcom-generic-rdk/meta-brcm-generic-rdk/recipes-multimedia/gstreamer/gstreamer1.0-plugins-good*',
+		'/meta-rdk/recipes-support/libsoup/libsoup-2.4*'
 	],
         '17.4' : [
                 '/meta-rdk-broadcom-generic-rdk/meta-brcm-generic-rdk/recipes-wpe/wpewebkit/wpewebkit_%.bbappend',
